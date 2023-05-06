@@ -1,4 +1,4 @@
-package com.example.gpsdraw
+package com.example.gpsdraw.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
