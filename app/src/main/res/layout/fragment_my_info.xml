@@ -5,10 +5,12 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MyInfoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="내정보 페이지" />
+        android:layout_height="50dp"
+        android:background="@color/white_purple"
+        android:orientation="vertical">
+
+    </LinearLayout>
 
 </FrameLayout>

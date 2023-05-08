@@ -3,19 +3,66 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
-        android:name="com.example.gpsdraw.fragment.MainFragment"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+
+        android:id="@+id/slidingUpPanelLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:gravity="bottom"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:umanoFadeColor="@android:color/transparent"
+        app:umanoOverlay="false"
+        app:umanoPanelHeight="60dp"
+        tools:context=".MainActivity">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.naver.maps.map.MapFragment"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/slide_layout"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00000000"
+
+            app:layout_constraintEnd_toStartOf="@+id/fragmentContainerView"
+            app:layout_constraintStart_toStartOf="@+id/fragmentContainerView">
+
+            <androidx.fragment.app.FragmentContainerView
+
+                android:id="@+id/fragmentContainerView"
+                android:name="com.example.gpsdraw.fragment.MainFragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavi"
@@ -23,10 +70,13 @@
         android:layout_height="wrap_content"
         app:itemIconTint="@color/purple_200"
         app:itemRippleColor="@null"
-        app:itemTextColor="@color/purple_200"
+        app:itemTextColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/navi_menu" />
+        app:layout_constraintTop_toBottomOf="@+id/slidingUpPanelLayout"
+        app:menu="@menu/navi_menu">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
