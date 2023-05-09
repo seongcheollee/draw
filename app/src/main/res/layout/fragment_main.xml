@@ -22,10 +22,9 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="712dp"
-            android:background="#B5FFFFFF"
+            android:layout_height="0dp"
+            android:background="#FFFFFF"
             android:scrollbars="none"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

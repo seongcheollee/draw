@@ -5,19 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:backgroundTint="@color/yellow"
+        android:tint="@color/white"
+
+        app:borderWidth="0dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/slidingUpPanelLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_draw_pen"
+        app:tint="@color/black"
+        />
+
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
 
         android:id="@+id/slidingUpPanelLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+
         android:gravity="bottom"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toTopOf="parent"
-        app:umanoFadeColor="@android:color/transparent"
-        app:umanoOverlay="false"
+        app:umanoOverlay="true"
         app:umanoPanelHeight="60dp"
+        app:umanoShadowHeight="0dp"
         tools:context=".MainActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,10 +55,10 @@
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintVertical_bias="1.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -44,6 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#00000000"
+            android:elevation="10dp"
 
             app:layout_constraintEnd_toStartOf="@+id/fragmentContainerView"
             app:layout_constraintStart_toStartOf="@+id/fragmentContainerView">
@@ -53,7 +78,8 @@
                 android:id="@+id/fragmentContainerView"
                 android:name="com.example.gpsdraw.fragment.MainFragment"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -68,12 +94,14 @@
         android:id="@+id/bottomNavi"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:itemIconTint="@color/purple_200"
+        android:background="#FEFFFF"
+        app:itemIconTint="@drawable/menu_click_color"
         app:itemRippleColor="@null"
-        app:itemTextColor="@color/black"
+        app:itemTextColor="@drawable/menu_click_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toBottomOf="@+id/slidingUpPanelLayout"
         app:menu="@menu/navi_menu">
 
