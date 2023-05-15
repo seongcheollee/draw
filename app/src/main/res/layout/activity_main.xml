@@ -23,8 +23,65 @@
         tools:context=".MainActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainConstLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_draw_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:backgroundTintMode="src_over"
+
+                android:elevation="10dp"
+                android:src="@drawable/ic_play"
+                app:borderWidth="0dp"
+                app:elevation="20dp"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@id/fab_draw"
+                app:layout_constraintEnd_toEndOf="@id/fab_draw"
+                app:layout_constraintStart_toStartOf="@id/fab_draw"
+                app:layout_constraintTop_toTopOf="@id/fab_draw"
+                app:tint="#F44336"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_draw_sub2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                app:tint="#000000"
+                android:backgroundTintMode="src_over"
+                android:clickable="true"
+                android:elevation="10dp"
+                android:src="?android:attr/listChoiceIndicatorMultiple"
+                app:backgroundTint="@color/black"
+                app:borderWidth="0dp"
+                app:elevation="20dp"
+                app:fabSize="mini"
+                app:layout_constraintBottom_toBottomOf="@id/fab_draw"
+                app:layout_constraintEnd_toEndOf="@id/fab_draw"
+                app:layout_constraintStart_toStartOf="@id/fab_draw"
+                app:layout_constraintTop_toTopOf="@id/fab_draw"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_draw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/yellow"
+                android:backgroundTintMode="src_over"
+                app:borderWidth="0dp"
+                app:elevation="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.879"
+                app:srcCompat="@drawable/ic_draw_pen"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <fragment
                 android:id="@+id/mapView"
@@ -33,29 +90,139 @@
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="1.0" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floatingActionButton"
+            <HorizontalScrollView
+                android:id="@+id/tag_scroll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/yellow"
-                android:clickable="true"
 
-                android:tint="@color/white"
-
-                app:borderWidth="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:elevation="20dp"
+                android:scrollbars="none"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.907"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.119"
-                app:srcCompat="@drawable/ic_draw_pen"
-                app:tint="@color/black" />
+                app:layout_constraintTop_toBottomOf="@+id/searchView2"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="@android:color/transparent"
+                    android:elevation="20dp">
+
+                    <Button
+                        android:id="@+id/button"
+                        android:layout_width="60dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="아트"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="60dp"
+
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="풍경"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/button3"
+                        android:layout_width="60dp"
+
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="맛집"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/button5"
+                        android:layout_width="60dp"
+
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="지름길"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/button6"
+                        android:layout_width="60dp"
+
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="여행"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/button4"
+                        android:layout_width="60dp"
+
+                        android:layout_height="30dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:alpha="1"
+                        android:background="@drawable/circle_btn_view"
+                        android:backgroundTint="@color/white"
+                        android:elevation="20dp"
+                        android:text="축제"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <SearchView
+                android:id="@+id/searchView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="10dp"
+                android:alpha="1"
+                android:background="@color/white"
+                android:elevation="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -98,9 +265,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
         app:layout_constraintTop_toBottomOf="@+id/slidingUpPanelLayout"
-        app:menu="@menu/navi_menu">
+        app:menu="@menu/navi_menu"
+        app:labelVisibilityMode="unlabeled">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
