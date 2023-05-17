@@ -3,28 +3,22 @@ package com.example.gpsdraw
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import android.widget.Button
 import com.example.gpsdraw.ui.login.LoginActivity
 
-class LoadingActivity : AppCompatActivity() {
+class SignUpFormActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_loading)
+        setContentView(R.layout.activity_sign_up_form)
 
-        Handler().postDelayed({
+
+
+        val signup = findViewById<Button>(R.id.signBtn)
+        signup.setOnClickListener{
             val intent = Intent(this, LoginActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             startActivity(intent)
             finish()
-        }, DURATION)
-
+        }
     }
-    companion object {
-        private const val DURATION : Long = 1000
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
 }
