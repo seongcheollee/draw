@@ -1,0 +1,6 @@
+<!-- button_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/ligth_grey" />
+    <corners android:radius="9dp" />
+    <size android:height="50dp" />
+</shape>
