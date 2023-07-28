@@ -4,35 +4,42 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.annotation.UiThread
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.gpsdraw.fragment.MainFragment
 import com.example.gpsdraw.fragment.MyInfoFragment
-import com.example.gpsdraw.fragment.SearchFragment
 import com.google.android.gms.location.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.*
-import com.naver.maps.map.overlay.LocationOverlay
-import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -43,13 +50,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     lateinit var locationCallback: LocationCallback //gps응답 값을 가져온다.
     private val PERMISSION = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION ,android.Manifest.permission.ACCESS_COARSE_LOCATION )
-    private lateinit var fabbtn: FloatingActionButton
-    private lateinit var fabstop: FloatingActionButton
-    private lateinit var fabplay: FloatingActionButton
+    private lateinit var fabbtn: View
+    private lateinit var fabstop: View
+    private lateinit var fabpause: View
+    private lateinit var fabplay: View
     private  var mylocList: MutableList<LatLng> = mutableListOf()
     private var isFabOpen = false
+    // 보정
+    private val FILTER_SIZE = 10 // 이동 평균 필터 크기
+    private val locationFilter = mutableListOf<LatLng>() // GPS 좌표 필터링을 위한 리스트
+    val CAMERA = arrayOf(Manifest.permission.CAMERA)
+    val STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    val CAMERA_CODE = 98
+    val STORAGE_CODE = 99
 
-
+    private var isDrawing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,98 +75,51 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
 
-        if (isPermitted()) {
-            startProcess()
-        }else{
-            ActivityCompat.requestPermissions(this, PERMISSION, LOCATION_PERMISSION)
-        }
+        //
+        if (isPermitted()) startProcess() else ActivityCompat.requestPermissions(this, PERMISSION, LOCATION_PERMISSION)
 
+        setupBottomNavigationView()
+        setupFabButton()
+
+    }//onCreate
+
+
+
+
+
+    private fun setupBottomNavigationView() {
 
         val homeFragment = MainFragment()
         val mypageFragment = MyInfoFragment()
-        val searchFragment = SearchFragment()
         val slide = findViewById<SlidingUpPanelLayout>(R.id.slidingUpPanelLayout)
+        val bnv = findViewById<BottomNavigationView>(R.id.bottomNavi)
 
-
-        // 네비게이션 바 설정
-        var bnv = findViewById<BottomNavigationView>(R.id.bottomNavi)
         bnv.setOnItemSelectedListener { MenuItem ->
             when (MenuItem.itemId) {
                 R.id.gpsFragment -> {
                     replaceFragment(homeFragment)
                     slide.isTouchEnabled = true
+                    slide.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                 }
                 R.id.myPageFragment -> {
                     slide.isTouchEnabled = true
                     replaceFragment(mypageFragment)
+                    slide.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
                 }
                 R.id.homeFragment -> {
                     slide.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
                     slide.isTouchEnabled = false
+                    CallCamera()
                 }
             }
             true
         }
-
-        fabbtn = findViewById<FloatingActionButton>(R.id.fab_draw)
-        fabplay = findViewById<FloatingActionButton>(R.id.fab_draw_sub)
-        fabstop = findViewById<FloatingActionButton>(R.id.fab_draw_sub2)
-
-        val search = findViewById<SearchView>(R.id.searchView2)
-        val tagScoll = findViewById<HorizontalScrollView>(R.id.tag_scroll)
-
-        // 플로팅 버튼 이벤트 - 메인
-        fabbtn.setOnClickListener{
-
-            if (fabbtn.isClickable == true){
-                fabplay.backgroundTintList =  ColorStateList.valueOf(ContextCompat.getColor(this, R.color.black))
-            }
-            else{
-                fabplay.backgroundTintList =  ColorStateList.valueOf(ContextCompat.getColor(this, R.color.yellow))
-
-            }
-
-            fabbtn.setRippleColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)))
-
-            fabbtn.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.black))
-
-            toggleFab()
-
-
-        }
-        // 플로팅 버튼 클릭 이벤트 - 재생
-        fabplay.setOnClickListener {
-            if (search.visibility == View.VISIBLE) {
-                search.visibility = View.GONE
-                tagScoll.visibility = View.GONE
-                onResume()
-                Toast.makeText(this, "플레이", Toast.LENGTH_SHORT).show()
-
-            }
-            else{
-                Toast.makeText(this, "이미 플레이 중입니다", Toast.LENGTH_SHORT).show()
-
-            }
-        }
-        // 플로팅 버튼 클릭 이벤트 - 종료
-        fabstop.setOnClickListener {
-            if (search.visibility == View.GONE) {
-                search.visibility = View.VISIBLE
-                tagScoll.visibility = View.VISIBLE
-                Toast.makeText(this, "정지", Toast.LENGTH_SHORT).show()
-            }
-            else{
-                Toast.makeText(this, "아직 재생하지 않았습니다!", Toast.LENGTH_SHORT).show()
-
-            }
-
-        }
-
-
-
-
-
     }
+
+
+
+
+
     private fun isPermitted() : Boolean{
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED &&
@@ -162,6 +131,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
+
+    // Naver map 연결
     private  fun startProcess(){
         val fm = supportFragmentManager
         val mapFragment = fm.findFragmentById(R.id.mapView) as MapFragment?
@@ -172,7 +143,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @UiThread
-    //NaverMap 객체는 오직 콜백 메서드를 이용해서 얻어올 수 있습니다.
     override fun onMapReady(map: NaverMap) {
         naverMap = map
         val locationOverlay = naverMap.locationOverlay
@@ -207,20 +177,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val locationRequest = LocationRequest.create()
         locationRequest.run {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY //높은 정확도
-            interval = 1000 //1초에 한번씩 GPS 요청
+            interval = 10000 //10초에 한번씩 GPS 요청
         }
 
         locationCallback = object : LocationCallback() {
+            var counter = 0
+
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
-                for ((i, location) in locationResult.locations.withIndex()) {
+                counter++
+                if (counter % 2 == 0) { // 10초마다 한 번씩 처리
+                    val location = locationResult.lastLocation
                     Log.d("location: ", "${location.latitude}, ${location.longitude}")
                     setLastLocation(location)
                 }
             }
         }
         //location 요청 함수 호출 (locationRequest, locationCallback)
-
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
@@ -230,17 +203,100 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun setLastLocation(location: Location) {
         val myLocation = LatLng(location.latitude, location.longitude)
-        // 현재 갱신되는 gps의 좌표값이 부동시에도 일정하지 못한 문제. 좌표값 중 변동률이 심한 부분에 대한 라운딩 필요
-        // 연결 받아와서 리스트에 추가시 오류 발생. -> 초기화 문제 -> 해결
-        mylocList.add(myLocation)
-        Log.d("위치 갱신", "${mylocList.size}}")
-        // 현재
-        mylocList.add(myLocation)
-        val path = PathOverlay()
-        path.coords = mylocList
-        path.progress = 0.5
-        path.map = naverMap
-        //marker.map = null
+        // 최초 위치 설정
+        if (mylocList.size < 2) {
+            mylocList.add(myLocation)
+            return
+        }
+        // 이동 거리 계산
+        val previousLocation = mylocList.last()
+        val distance = previousLocation.distanceTo(myLocation)
+        Log.d("이동 거리", "$distance")
+        // 이동 거리가 10미터 이상인 경우에만 좌표 추가
+        if (distance >= 10) { mylocList.add(myLocation) }
+        Log.d("위치 갱신", "${mylocList.size}")
+        drawPath(mylocList)
+    }
+    private fun drawPath(coords: List<LatLng>) {
+        val path = PathOverlay().apply {
+            this.coords = coords
+            this.progress = 0.5
+            this.map = naverMap
+        }
+
+        if (coords.size >= FILTER_SIZE) {
+            val filteredLocation = getFilteredLocation()
+            val filteredPath = PathOverlay().apply {
+                this.coords = filteredLocation
+                this.progress = 0.5
+                this.map = naverMap
+            }
+        }
+    }
+
+    private fun getFilteredLocation(): List<LatLng> {
+        val filteredLocation = mutableListOf<LatLng>()
+
+        for (i in FILTER_SIZE - 1 until mylocList.size) {
+            val latSum = mylocList.subList(i - FILTER_SIZE + 1, i + 1).sumByDouble { it.latitude }
+            val lonSum = mylocList.subList(i - FILTER_SIZE + 1, i + 1).sumByDouble { it.longitude }
+            val latAvg = latSum / FILTER_SIZE
+            val lonAvg = lonSum / FILTER_SIZE
+            val filteredLatLng = LatLng(latAvg, lonAvg)
+            filteredLocation.add(filteredLatLng)
+        }
+
+        return filteredLocation
+    }
+
+
+
+
+    private fun setupFabButton() {
+        fabbtn = findViewById(R.id.fab_draw)
+        fabplay = findViewById(R.id.fab_draw_sub)
+        fabstop = findViewById(R.id.fab_draw_sub2)
+        fabpause = findViewById(R.id.fab_draw_sub3)
+
+        val search = findViewById<SearchView>(R.id.searchView2)
+        val tagScroll = findViewById<HorizontalScrollView>(R.id.tag_scroll)
+
+        fabbtn.setOnClickListener { view ->
+            if (fabbtn.isClickable) {
+                fabplay.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.black))
+            } else {
+                fabplay.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.yellow))
+            }
+            toggleFab()
+        }
+
+        fabplay.setOnClickListener { view ->
+            if (search.visibility == View.VISIBLE) {
+                search.visibility = View.GONE
+                tagScroll.visibility = View.GONE
+                isDrawing = true
+                onResume()
+                Snackbar.make(view, "그리기 시작", Snackbar.LENGTH_LONG)
+                    .show()
+            } else {
+                Toast.makeText(this, "이미 그리고 있습니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        fabstop.setOnClickListener { view ->
+            if (search.visibility == View.GONE) {
+                search.visibility = View.VISIBLE
+                tagScroll.visibility = View.VISIBLE
+                Snackbar.make(view, "종료!", Snackbar.LENGTH_LONG)
+                    .setAction("자랑하기") {}
+                    .setActionTextColor(Color.YELLOW)
+                    .show()
+            } else {
+                Toast.makeText(this, "아직 그리지 않았습니다!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
     /***
      *  플로팅 액션 버튼 클릭시 동작하는 애니메이션 효과 세팅
@@ -250,12 +306,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // 플로팅 액션 버튼 닫기 - 열려있는 플로팅 버튼 집어넣는 애니메이션 세팅
         if (isFabOpen) {
             ObjectAnimator.ofFloat(fabplay, "translationX", 0f).apply { start() }
-            ObjectAnimator.ofFloat(fabstop, "translationX", 0f).apply { start() }
+            ObjectAnimator.ofFloat(fabstop, "translationY", 0f).apply { start() }
+            ObjectAnimator.ofFloat(fabpause, "translationY", 0f).apply { start() }
+
 
             // 플로팅 액션 버튼 열기 - 닫혀있는 플로팅 버튼 꺼내는 애니메이션 세팅
         } else {
-            ObjectAnimator.ofFloat(fabplay, "translationX", 150f).apply { start() }
-            ObjectAnimator.ofFloat(fabstop, "translationX", 300f).apply { start() }
+            ObjectAnimator.ofFloat(fabplay, "translationX", -150f).apply { start() }
+            ObjectAnimator.ofFloat(fabstop, "translationY", -300f).apply { start() }
+            ObjectAnimator.ofFloat(fabpause, "translationY", -150f).apply { start() }
+
         }
 
         isFabOpen = !isFabOpen
@@ -270,6 +330,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 commit()
             }
     }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -306,25 +368,119 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapView.onLowMemory()
     }
 
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when {
-            requestCode != LOCATION_PERMISSION -> {
-                return
-            }
-            else -> {
-                when {
-                    locationSource.onRequestPermissionsResult(requestCode,permissions,grantResults) -> {
-                        if (!locationSource.isActivated){
-                            naverMap.locationTrackingMode = LocationTrackingMode.None
-                        }else{
-                            naverMap.locationTrackingMode = LocationTrackingMode.Follow
-                        }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            LOCATION_PERMISSION -> {
+                if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                    if (!locationSource.isActivated) {
+                        naverMap.locationTrackingMode = LocationTrackingMode.None
+                    } else {
+                        naverMap.locationTrackingMode = LocationTrackingMode.Follow
                     }
                 }
             }
+            CAMERA_CODE -> {
+                for (grant in grantResults) {
+                    if (grant != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, "카메라 권한을 승인해 주세요", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            STORAGE_CODE -> {
+                for (grant in grantResults) {
+                    if (grant != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, "저장소 권한을 승인해 주세요", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun checkPermission(permission: String, requestCode: Int): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+                return false
+            }
+        }
+        return true
+    }
+
+
+
+
+
+    // 사진 저장
+    fun saveFile(fileName:String, mimeType:String, bitmap: Bitmap): Uri?{
+
+        var CV = ContentValues()
+
+        // MediaStore 에 파일명, mimeType 을 지정
+        CV.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        CV.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+
+        // 안정성 검사
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            CV.put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        // MediaStore 에 파일을 저장
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, CV)
+        if(uri != null){
+            var scriptor = contentResolver.openFileDescriptor(uri, "w")
+
+            val fos = FileOutputStream(scriptor?.fileDescriptor)
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            fos.close()
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                CV.clear()
+                // IS_PENDING 을 초기화
+                CV.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(uri, CV, null, null)
+            }
+        }
+        return uri
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                CAMERA_CODE -> {
+                    if (data?.extras?.get("data") != null) {
+                        val img = data?.extras?.get("data") as Bitmap
+                        val uri = saveFile(RandomFileName(), "image/jpeg", img)
+//                        imageView.setImageURI(uri)
+                    }
+                }
+                // 필요한 경우 다른 요청 코드도 여기에서 처리합니다.
+            }
+        }
+    }
+
+
+
+    // 파일명을 날짜 저장
+    fun RandomFileName() : String{
+        val fileName = SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())
+        return fileName
+    }
+
+
+    private fun CallCamera() {
+        try {
+            if (checkPermission(Manifest.permission.CAMERA, CAMERA_CODE) && checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, STORAGE_CODE) && checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_CODE)) {
+                val itt = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                startActivityForResult(itt, CAMERA_CODE)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // 예외 처리를 위한 다른 로직 추가
+        }
     }
 }
