@@ -1,15 +1,21 @@
 package com.example.gpsdraw.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gpsdraw.ProfileEditActivity
 import com.example.gpsdraw.R
+import com.example.gpsdraw.SettingActivity
 import com.example.gpsdraw.adapter.GridAdapter
+import com.example.gpsdraw.adapter.RouteListAdapter
 import com.example.gpsdraw.adapter.UserPostAdapter
 import com.example.gpsdraw.data.RoadImages
 import com.example.gpsdraw.data.UserPostData
@@ -17,8 +23,12 @@ import com.example.gpsdraw.data.UserPostData
 class MyInfoFragment : Fragment() {
 
     private var gridLayoutManager: RecyclerView.LayoutManager? = null
-    private var recyclerAdapter: RecyclerView.Adapter<GridAdapter.ViewHolder>? = null
+    private var horLayoutManager: RecyclerView.LayoutManager? = null
+    private var setButton : ImageButton? = null
+    private var profileSetButton : Button? = null
 
+    private var gridrecyclerAdapter: RecyclerView.Adapter<GridAdapter.ViewHolder>? = null
+    private var routerecyclerAdapter: RecyclerView.Adapter<RouteListAdapter.ViewHolder>? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,13 +49,34 @@ class MyInfoFragment : Fragment() {
 
 
         val view = inflater!!.inflate(R.layout.fragment_my_info, container, false)
-        val recyclerView: RecyclerView = view.findViewById(R.id.myGridView)
+        val gridRecyclerView: RecyclerView = view.findViewById(R.id.myGridView)
+        val routeRecyclerView: RecyclerView = view.findViewById(R.id.myRouteView)
 
-        recyclerAdapter = GridAdapter(imglist)
+
+        gridrecyclerAdapter = GridAdapter(imglist)
         gridLayoutManager =  GridLayoutManager(activity, 3)
 
-        recyclerView.layoutManager = gridLayoutManager
-        recyclerView.adapter = recyclerAdapter
+        gridRecyclerView.layoutManager = gridLayoutManager
+        gridRecyclerView.adapter = gridrecyclerAdapter
+
+        routerecyclerAdapter = RouteListAdapter(imglist)
+        horLayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+
+        routeRecyclerView.layoutManager = horLayoutManager
+        routeRecyclerView.adapter = routerecyclerAdapter
+
+        setButton = view.findViewById(R.id.settingBtn)
+        setButton?.setOnClickListener {
+            val intent = Intent(activity, SettingActivity::class.java)
+            startActivity(intent)
+        }
+
+        profileSetButton = view.findViewById(R.id.profileEdit)
+
+        profileSetButton?.setOnClickListener {
+            val intent = Intent(activity, ProfileEditActivity::class.java)
+            startActivity(intent)
+        }
         return view
     }
 
