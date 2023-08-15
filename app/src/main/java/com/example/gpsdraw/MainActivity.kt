@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.gpsdraw.fragment.MainFragment
 import com.example.gpsdraw.fragment.MyInfoFragment
+import com.example.gpsdraw.ui.login.App
 import com.google.android.gms.location.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -74,6 +75,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
+        Log.d("현재 토큰 값", "${App.prefs.token}")
 
         //
         if (isPermitted()) startProcess() else ActivityCompat.requestPermissions(this, PERMISSION, LOCATION_PERMISSION)
@@ -97,9 +99,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         bnv.setOnItemSelectedListener { MenuItem ->
             when (MenuItem.itemId) {
                 R.id.gpsFragment -> {
-                    replaceFragment(homeFragment)
                     slide.isTouchEnabled = true
+                    replaceFragment(homeFragment)
                     slide.panelState = SlidingUpPanelLayout.PanelState.EXPANDED
+
                 }
                 R.id.myPageFragment -> {
                     slide.isTouchEnabled = true
@@ -270,6 +273,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     ColorStateList.valueOf(ContextCompat.getColor(this, R.color.yellow))
             }
             toggleFab()
+        }
+
+        fabpause.setOnClickListener { view ->
+            if (search.visibility == View.GONE) {
+                Toast.makeText(this, "정지", Toast.LENGTH_SHORT).show()
+
+            } else {
+                Toast.makeText(this, "아직 그리지 않았습니다!", Toast.LENGTH_SHORT).show()
+            }
+
         }
 
         fabplay.setOnClickListener { view ->
