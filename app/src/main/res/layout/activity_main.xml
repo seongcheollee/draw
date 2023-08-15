@@ -10,8 +10,8 @@
         android:id="@+id/slidingUpPanelLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
         android:gravity="bottom"
+
         app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -248,8 +248,9 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="10dp"
+                app:iconifiedByDefault="false"
                 android:alpha="1"
-                android:background="@color/white"
+                android:background="@drawable/circle_img_view"
                 android:elevation="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
