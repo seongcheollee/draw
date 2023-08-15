@@ -1,13 +1,19 @@
 package com.example.gpsdraw.adapter
 
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gpsdraw.R
 import com.example.gpsdraw.data.RoadImages
 
+interface OnImageClickListener {
+    fun onItemClick(position: Int)
+}
 class RouteListAdapter(val imgs : ArrayList<RoadImages>) : RecyclerView.Adapter<RouteListAdapter.ViewHolder>() {
 
 
@@ -17,7 +23,7 @@ class RouteListAdapter(val imgs : ArrayList<RoadImages>) : RecyclerView.Adapter<
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        //holder.content.text = imgs[position].id
+        //holder.content.text = ""
     }
 
     override fun getItemCount(): Int {
@@ -25,8 +31,10 @@ class RouteListAdapter(val imgs : ArrayList<RoadImages>) : RecyclerView.Adapter<
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        //val content: TextView = itemView.findViewById(R.id.imgname)
 
     }
 
+
+
 }
+
