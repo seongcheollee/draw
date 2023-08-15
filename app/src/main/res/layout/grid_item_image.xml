@@ -8,11 +8,12 @@
 
     <ImageView
         android:id="@+id/userImg"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="130dp"
+        android:layout_height="120dp"
         android:layout_margin="1dp"
         android:adjustViewBounds="true"
         app:srcCompat="@android:color/system_neutral1_100" />
+
 
     <TextView
         android:id="@+id/imgname"
